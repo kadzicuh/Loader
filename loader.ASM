@@ -65,7 +65,6 @@ section '.code' code readable executable
                 push param
                 push param
                 call [strcat_s]
-
 restart:
                 push fileDir
                 call [PathFileExists]
