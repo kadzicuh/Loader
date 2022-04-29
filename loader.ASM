@@ -43,11 +43,11 @@ section '.code' code readable executable
 
         start:
                 push tmpDir        ; [out] LPSTR lpBuffer
-                push tmpDir        ; [in]  DWORD nBufferLength
+                push 256           ; [in]  DWORD nBufferLength
                 call [GetTempPath] ; stdcall (calling conventions)
 ;----------------------------------------------------------------------------------------------
                 push tmpDir     ; const char *src
-                push fileDir    ; rsize_t dest_size
+                push 256        ; rsize_t dest_size
                 push fileDir    ; char *dest
                 call [strcpy_s] ; cdecl (calling conventions)
 
@@ -57,7 +57,7 @@ section '.code' code readable executable
                 add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
                 push fileName   ; const char *strSource
-                push fileDir    ; size_t numberOfElements
+                push 256        ; size_t numberOfElements
                 push fileDir    ; char *strDestination
                 call [strcat_s] ; cdecl (calling conventions)
 
@@ -67,7 +67,7 @@ section '.code' code readable executable
                 add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
                 push s1         ; const char *src
-                push param      ; rsize_t dest_size
+                push 256        ; rsize_t dest_size
                 push param      ; char *dest
                 call [strcpy_s] ; cdecl (calling conventions)
 
@@ -77,7 +77,7 @@ section '.code' code readable executable
                 add esp,eax     ; clear stack
 ;----------------------------------------------------------------------------------------------
                 push fileDir    ; const char *strSource
-                push param      ; size_t numberOfElements
+                push 256        ; size_t numberOfElements
                 push param      ; char *strDestination
                 call [strcat_s] ; cdecl (calling conventions)
 
